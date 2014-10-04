@@ -1,0 +1,406 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:diagrams="clr-namespace:Telerik.Windows.Controls.Diagrams;assembly=Telerik.Windows.Controls.Diagrams"
+		xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation" xmlns:local="clr-namespace:SettingsPaneSample">
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary Source="MindMapTemplates.xaml" />
+	</ResourceDictionary.MergedDictionaries>
+
+
+	<Style x:Key="arrowPath" TargetType="Path">
+		<Setter Property="Width" Value="10" />
+		<Setter Property="Height" Value="5" />
+		<Setter Property="Fill" Value="White" />
+		<Setter Property="RenderTransformOrigin" Value="0.5 0.5" />
+	</Style>
+
+	<Style x:Key="rootShapeStyle" TargetType="local:MindmapRootShape">
+		<Setter Property="UseDefaultConnectors" Value="False" />
+		<Setter Property="telerik:RadDiagramConnection.ConnectorCenterPoint" Value="0.5, 0.5" />
+		<Setter Property="ZIndex" Value="1" />
+		<Setter Property="Background" Value="#333333" />
+		<Setter Property="BorderBrush" Value="#333333" />
+		<Setter Property="Position" Value="{Binding Position, Mode=TwoWay}" />
+		<Setter Property="BorderThickness" Value="1" />
+		<Setter Property="StrokeThickness" Value="1" />
+		<Setter Property="Foreground" Value="White" />
+		<Setter Property="AreChildrenVisible" Value="{Binding AreChildrenVisible, Mode=TwoWay}" />
+		<Setter Property="Padding" Value="6 20 6 2" />
+		<Setter Property="Visibility"
+				Value="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=TwoWay}" />
+		<Setter Property="AllowDrop" Value="False" />
+		<Setter Property="StrokeDashArray" Value="1 0" />
+		<Setter Property="HorizontalContentAlignment" Value="Center" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
+		<Setter Property="ContentTemplate" Value="{StaticResource rootContentTemplate}" />
+		<Setter Property="EditTemplate" Value="{StaticResource editTemplate}" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="local:MindmapRootShape">
+					<Grid Background="Transparent" Opacity="{TemplateBinding Opacity}">
+						<VisualStateManager.VisualStateGroups>
+							<VisualStateGroup x:Name="States">
+								<VisualState x:Name="Borderless" />
+								<VisualState x:Name="WithBorder">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Duration="0"
+												Storyboard.TargetName="PART_mouseOverBorder"
+												Storyboard.TargetProperty="Visibility">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<Visibility>Visible</Visibility>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+							</VisualStateGroup>
+							<VisualStateGroup x:Name="EditMode">
+								<VisualState x:Name="NormalMode" />
+								<VisualState x:Name="NormalEditMode">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Duration="0"
+												Storyboard.TargetName="NormalContent"
+												Storyboard.TargetProperty="Visibility">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<Visibility>Collapsed</Visibility>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="EditContent"
+												Storyboard.TargetProperty="Visibility">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<Visibility>Visible</Visibility>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+							</VisualStateGroup>
+						</VisualStateManager.VisualStateGroups>
+						<Grid Margin="9">
+							<Ellipse HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+									Fill="{TemplateBinding Background}" />
+							<ContentPresenter x:Name="NormalContent" Margin="{TemplateBinding Padding}"
+									HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+									VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+									diagrams:DiagramBehaviors.TextElementForeground="{TemplateBinding Foreground}"
+									diagrams:DiagramBehaviors.TextWrapping="Wrap" />
+							<ContentPresenter x:Name="EditContent"
+									HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+									VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+									Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding EditTemplate}"
+									Visibility="Collapsed" />
+						</Grid>
+						<Grid x:Name="PART_mouseOverBorder" Visibility="Collapsed">
+							<StackPanel x:Name="buttonsPanel" Margin="0 -16 0 0" HorizontalAlignment="Right"
+									VerticalAlignment="Top" Background="Transparent" Orientation="Horizontal">
+								<telerik:RadGeometryDropDownButton IsOpen="{Binding RelativeSource={RelativeSource TemplatedParent},
+									                                                       Path=IsSettingsOpen,
+									                                                       Mode=TwoWay}"
+										PopupPlacementTarget="{Binding ElementName=buttonsPanel}"
+										Style="{StaticResource RadGeometrySmallDropDownButtonStyle}">
+									<telerik:RadGeometryDropDownButton.DropDownContent>
+										<local:SettingsPane Width="235" MinHeight="205" />
+									</telerik:RadGeometryDropDownButton.DropDownContent>
+								</telerik:RadGeometryDropDownButton>
+								<!--
+										<telerik:RadGeometryButton x:Name="settingsButton"
+										Style="{StaticResource RadGeometrySettingsButtonStyle}" />
+									-->
+							</StackPanel>
+							<Ellipse HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="{x:Null}"
+									Opacity="0.65" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="10" />
+							<Grid Margin="0 3" IsHitTestVisible="False">
+								<Path HorizontalAlignment="Center" VerticalAlignment="Bottom"
+										Data="M1.1665348,1.1665272 L9.3333454,1.1665272 L5.333334,4.6667161 z"
+										Stretch="Uniform" Style="{StaticResource arrowPath}" />
+								<Path HorizontalAlignment="Center" VerticalAlignment="Top"
+										Data="M1.1665348,1.1665272 L9.3333454,1.1665272 L5.333334,4.6667161 z"
+										Stretch="Uniform" Style="{StaticResource arrowPath}">
+									<Path.RenderTransform>
+										<RotateTransform Angle="-180" />
+									</Path.RenderTransform>
+								</Path>
+								<Path HorizontalAlignment="Left" VerticalAlignment="Center"
+										Data="M1.1665348,1.1665272 L9.3333454,1.1665272 L5.333334,4.6667161 z"
+										Stretch="Uniform" Style="{StaticResource arrowPath}">
+									<Path.RenderTransform>
+										<RotateTransform Angle="90" />
+									</Path.RenderTransform>
+								</Path>
+								<Path HorizontalAlignment="Right" VerticalAlignment="Center"
+										Data="M1.1665348,1.1665272 L9.3333454,1.1665272 L5.333334,4.6667161 z"
+										Stretch="Uniform" Style="{StaticResource arrowPath}">
+									<Path.RenderTransform>
+										<RotateTransform Angle="-90" />
+									</Path.RenderTransform>
+								</Path>
+							</Grid>
+						</Grid>
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="firstLevelShapeStyle" TargetType="local:MindmapFirstLevelShape">
+		<Setter Property="UseDefaultConnectors" Value="False" />
+		<Setter Property="telerik:RadDiagramConnection.ConnectorCenterPoint" Value="0.5, 0.5" />
+		<Setter Property="ZIndex" Value="1" />
+		<Setter Property="Background"
+				Value="{Binding MainColor, Converter={StaticResource mainColorToBackgroundConverter}}" />
+		<Setter Property="BorderBrush"
+				Value="{Binding MainColor, Converter={StaticResource mainColorToBackgroundConverter}}" />
+		<Setter Property="Position" Value="{Binding Position, Mode=TwoWay}" />
+		<Setter Property="BorderThickness" Value="2" />
+		<Setter Property="StrokeThickness" Value="1" />
+		<Setter Property="AreChildrenVisible" Value="{Binding AreChildrenVisible, Mode=TwoWay}" />
+		<Setter Property="Padding" Value="8 4 6 4" />
+		<Setter Property="Visibility"
+				Value="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=TwoWay}" />
+		<Setter Property="AllowDrop" Value="False" />
+		<Setter Property="StrokeDashArray" Value="1 0" />
+		<Setter Property="HorizontalContentAlignment" Value="Right" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
+		<Setter Property="ContentTemplate" Value="{StaticResource firstLevelContentTemplate}" />
+		<Setter Property="EditTemplate" Value="{StaticResource editTemplate}" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="local:MindmapFirstLevelShape">
+					<Grid Background="Transparent" Opacity="{TemplateBinding Opacity}">
+						<VisualStateManager.VisualStateGroups>
+							<VisualStateGroup x:Name="States">
+								<VisualState x:Name="Borderless" />
+								<VisualState x:Name="WithBorder">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Duration="0"
+												Storyboard.TargetName="PART_mouseOverBorder"
+												Storyboard.TargetProperty="Visibility">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<Visibility>Visible</Visibility>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+							</VisualStateGroup>
+							<VisualStateGroup x:Name="EditMode">
+								<VisualState x:Name="NormalMode" />
+								<VisualState x:Name="NormalEditMode">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Duration="0"
+												Storyboard.TargetName="NormalContent"
+												Storyboard.TargetProperty="Visibility">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<Visibility>Collapsed</Visibility>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="EditContent"
+												Storyboard.TargetProperty="Visibility">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<Visibility>Visible</Visibility>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+							</VisualStateGroup>
+						</VisualStateManager.VisualStateGroups>
+						<Grid Margin="9">
+							<Border Background="White" BorderBrush="{TemplateBinding BorderBrush}"
+									BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2"
+									Opacity="{TemplateBinding Opacity}">
+								<Border Background="{TemplateBinding Background}" Opacity="0.2" />
+							</Border>
+							<ContentPresenter x:Name="NormalContent" Margin="{TemplateBinding Padding}"
+									HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+									VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+									diagrams:DiagramBehaviors.TextElementForeground="{TemplateBinding Foreground}"
+									diagrams:DiagramBehaviors.TextWrapping="Wrap" />
+							<ContentPresenter x:Name="EditContent"
+									HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+									VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+									Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding EditTemplate}"
+									Visibility="Collapsed" />
+						</Grid>
+						<Grid x:Name="PART_mouseOverBorder" Visibility="Collapsed">
+							<StackPanel x:Name="buttonsPanel" Margin="0 -18 0 0" HorizontalAlignment="Right"
+									VerticalAlignment="Top" Background="Transparent" Orientation="Horizontal">
+								<telerik:RadGeometryDropDownButton
+										IsOpen="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsSettingsOpen, Mode=TwoWay}"
+										PopupPlacementTarget="{Binding ElementName=buttonsPanel}"
+										Style="{StaticResource RadGeometrySmallDropDownButtonStyle}">
+									<telerik:RadGeometryDropDownButton.DropDownContent>
+                                        <local:SettingsPane Width="235" MinHeight="205" />
+									</telerik:RadGeometryDropDownButton.DropDownContent>
+								</telerik:RadGeometryDropDownButton>
+								<telerik:RadGeometryButton Command="telerik:DiagramCommands.Delete"
+										CommandParameter="{Binding}"
+										Style="{StaticResource RadGeometrySmallButtonStyle}" />
+							</StackPanel>
+							<Border Background="{x:Null}" BorderBrush="{TemplateBinding BorderBrush}"
+									BorderThickness="10" CornerRadius="3" Opacity="0.65" />
+							<Grid Margin="0 3" IsHitTestVisible="False">
+								<Path HorizontalAlignment="Center" VerticalAlignment="Bottom"
+										Data="M1.1665348,1.1665272 L9.3333454,1.1665272 L5.333334,4.6667161 z"
+										Style="{StaticResource arrowPath}" />
+								<Path HorizontalAlignment="Center" VerticalAlignment="Top"
+										Data="M1.1665348,1.1665272 L9.3333454,1.1665272 L5.333334,4.6667161 z"
+										Style="{StaticResource arrowPath}">
+									<Path.RenderTransform>
+										<RotateTransform Angle="-180" />
+									</Path.RenderTransform>
+								</Path>
+								<Path HorizontalAlignment="Left" VerticalAlignment="Center"
+										Data="M1.1665348,1.1665272 L9.3333454,1.1665272 L5.333334,4.6667161 z"
+										Style="{StaticResource arrowPath}">
+									<Path.RenderTransform>
+										<RotateTransform Angle="90" />
+									</Path.RenderTransform>
+								</Path>
+								<Path HorizontalAlignment="Right" VerticalAlignment="Center"
+										Data="M1.1665348,1.1665272 L9.3333454,1.1665272 L5.333334,4.6667161 z"
+										Style="{StaticResource arrowPath}">
+									<Path.RenderTransform>
+										<RotateTransform Angle="-90" />
+									</Path.RenderTransform>
+								</Path>
+							</Grid>
+						</Grid>
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style x:Key="outerShapeStyle" TargetType="local:MindmapOuterShape">
+		<Setter Property="UseDefaultConnectors" Value="False" />
+		<Setter Property="telerik:RadDiagramConnection.ConnectorCenterPoint" Value="0.5, 1" />
+		<Setter Property="ZIndex" Value="1" />
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="BorderBrush"
+				Value="{Binding MainColor, Converter={StaticResource mainColorToBackgroundConverter}}" />
+		<Setter Property="Position" Value="{Binding Position, Mode=TwoWay}" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="StrokeThickness" Value="1" />
+		<Setter Property="AreChildrenVisible" Value="{Binding AreChildrenVisible, Mode=TwoWay}" />
+		<Setter Property="Padding" Value="6 1 6 3" />
+		<Setter Property="Visibility"
+				Value="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=TwoWay}" />
+		<Setter Property="AllowDrop" Value="False" />
+		<Setter Property="StrokeDashArray" Value="1 0" />
+		<Setter Property="HorizontalContentAlignment" Value="Center" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
+		<Setter Property="ContentTemplate" Value="{StaticResource subLevelContentTemplate}" />
+		<Setter Property="EditTemplate" Value="{StaticResource editTemplate}" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="local:MindmapOuterShape">
+					<Grid Background="Transparent" Opacity="{TemplateBinding Opacity}">
+						<VisualStateManager.VisualStateGroups>
+							<VisualStateGroup x:Name="States">
+								<VisualState x:Name="Borderless" />
+								<VisualState x:Name="WithBorder">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Duration="0"
+												Storyboard.TargetName="mouseOverBorder"
+												Storyboard.TargetProperty="Visibility">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<Visibility>Visible</Visibility>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Duration="0"
+												Storyboard.TargetName="mouseOverBackground"
+												Storyboard.TargetProperty="Visibility">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<Visibility>Visible</Visibility>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+							</VisualStateGroup>
+							<VisualStateGroup x:Name="EditMode">
+								<VisualState x:Name="NormalMode" />
+								<VisualState x:Name="NormalEditMode">
+									<Storyboard>
+										<ObjectAnimationUsingKeyFrames Duration="0"
+												Storyboard.TargetName="NormalContent"
+												Storyboard.TargetProperty="Visibility">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<Visibility>Collapsed</Visibility>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+										<ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetName="EditContent"
+												Storyboard.TargetProperty="Visibility">
+											<DiscreteObjectKeyFrame KeyTime="0">
+												<DiscreteObjectKeyFrame.Value>
+													<Visibility>Visible</Visibility>
+												</DiscreteObjectKeyFrame.Value>
+											</DiscreteObjectKeyFrame>
+										</ObjectAnimationUsingKeyFrames>
+									</Storyboard>
+								</VisualState>
+							</VisualStateGroup>
+						</VisualStateManager.VisualStateGroups>
+						<Border Margin="-1 0 -1 0" Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								BorderThickness="{TemplateBinding BorderThickness}" />
+						<Border Margin="-1 0 -1 -1" Background="Transparent" BorderBrush="{TemplateBinding BorderBrush}"
+								BorderThickness="0 0 0 2" />
+						<Border x:Name="mouseOverBackground" Background="{TemplateBinding BorderBrush}" Opacity="0.2"
+								Visibility="Collapsed" />
+						<ContentPresenter x:Name="NormalContent" Margin="{TemplateBinding Padding}"
+								HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+								VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+								diagrams:DiagramBehaviors.TextElementForeground="{TemplateBinding Foreground}"
+								diagrams:DiagramBehaviors.TextWrapping="Wrap" />
+						<ContentPresenter x:Name="EditContent"
+								HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+								VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+								Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding EditTemplate}"
+								Visibility="Collapsed" />
+						<Grid x:Name="mouseOverBorder" Visibility="Collapsed">
+							<StackPanel x:Name="buttonsPanel" Margin="0 -17 0 0" HorizontalAlignment="Right"
+									VerticalAlignment="Top" Background="Transparent" Orientation="Horizontal">
+								<telerik:RadGeometryDropDownButton
+										IsOpen="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=IsSettingsOpen, Mode=TwoWay}"
+										PopupPlacementTarget="{Binding ElementName=buttonsPanel}"
+										Style="{StaticResource RadGeometrySmallDropDownButtonStyle}">
+									<telerik:RadGeometryDropDownButton.DropDownContent>
+                                        <local:SettingsPane Width="235" MinHeight="205" />
+									</telerik:RadGeometryDropDownButton.DropDownContent>
+								</telerik:RadGeometryDropDownButton>
+								<telerik:RadGeometryButton Command="telerik:DiagramCommands.Delete"
+										CommandParameter="{Binding}"
+										Style="{StaticResource RadGeometrySmallButtonStyle}" />
+							</StackPanel>
+						</Grid>
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<Style BasedOn="{StaticResource RadDiagramConnectionStyle}" TargetType="telerik:RadDiagramConnection">
+		<Setter Property="BezierTension" Value="0.8" />
+		<Setter Property="ZIndex" Value="0" />
+		<Setter Property="ConnectionType" Value="Bezier" />
+		<Setter Property="StrokeThickness" Value="2" />
+		<Setter Property="Visibility"
+				Value="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=TwoWay}" />
+		<Setter Property="Stroke" Value="{Binding MainColor, Converter={StaticResource mainColorToBackgroundConverter}}" />
+	</Style>
+</ResourceDictionary>
